@@ -2,7 +2,7 @@
 
 A single Flutter binary with no backend. The interesting parts are the boundaries: where geometry comes from, who owns the video decoder, and what happens when every external dependency is missing at once.
 
-*Interactive map: [architecture map](https://fred-in-tech.github.io/architecture-maps/safezone-previewer/)*
+*Interactive map: [architecture map](https://fred-in-tech.github.io/fvm-system-maps/safezone-previewer/)*
 
 ## Module layout
 
