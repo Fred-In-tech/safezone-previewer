@@ -1,0 +1,754 @@
+{
+  "version": 1,
+  "project": {
+    "name": "SafeZone",
+    "slug": "safezone-previewer",
+    "tagline": "Preview vertical video against real platform UI safe zones, entirely on-device",
+    "iconDomain": "flutter.dev",
+    "date": "2026-09-01"
+  },
+  "stats": {
+    "agents": 0,
+    "models": 0,
+    "tools": 10,
+    "integrations": 6
+  },
+  "topModels": [],
+  "topTools": [
+    {
+      "id": "t_flutter",
+      "label": "Flutter",
+      "domain": "flutter.dev"
+    },
+    {
+      "id": "t_riverpod",
+      "label": "Riverpod",
+      "domain": "riverpod.dev"
+    },
+    {
+      "id": "t_dart",
+      "label": "Dart",
+      "domain": "dart.dev"
+    },
+    {
+      "id": "t_video_player",
+      "label": "video_player"
+    },
+    {
+      "id": "t_camera",
+      "label": "camera"
+    },
+    {
+      "id": "t_image_picker",
+      "label": "image_picker"
+    },
+    {
+      "id": "t_screenshot",
+      "label": "screenshot"
+    },
+    {
+      "id": "t_gal",
+      "label": "gal (gallery saver)"
+    },
+    {
+      "id": "t_share_plus",
+      "label": "share_plus"
+    },
+    {
+      "id": "t_flutter_svg",
+      "label": "flutter_svg"
+    }
+  ],
+  "topIntegrations": [
+    {
+      "id": "i_remote_config",
+      "label": "Firebase Remote Config",
+      "domain": "firebase.google.com"
+    },
+    {
+      "id": "i_admob",
+      "label": "Google AdMob",
+      "domain": "admob.google.com"
+    },
+    {
+      "id": "i_actions",
+      "label": "GitHub Actions",
+      "domain": "github.com"
+    },
+    {
+      "id": "i_appstore",
+      "label": "Apple App Store",
+      "domain": "apple.com"
+    },
+    {
+      "id": "i_play",
+      "label": "Google Play",
+      "domain": "play.google.com"
+    },
+    {
+      "id": "i_photos",
+      "label": "Device photo library"
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "main",
+        "label": "App entrypoint",
+        "kind": "entry",
+        "sub": "orientation lock + DI",
+        "detail": "Builds services synchronously and calls runApp without awaiting any network work.",
+        "sourceRef": "lib/main.dart"
+      },
+      {
+        "id": "app_services",
+        "label": "AppServices",
+        "kind": "service",
+        "sub": "immediate() then warmUp()",
+        "detail": "Boots from bundled presets with ads off, then folds Firebase and AdMob in after first paint.",
+        "sourceRef": "lib/core/bootstrap.dart"
+      },
+      {
+        "id": "home_screen",
+        "label": "Home / library",
+        "kind": "entry",
+        "sub": "templates + saved projects",
+        "detail": "One tap on a platform template creates a project already pointed at that feed.",
+        "sourceRef": "lib/features/projects/presentation/home_screen.dart"
+      },
+      {
+        "id": "preview_screen",
+        "label": "Editor canvas",
+        "kind": "entry",
+        "sub": "one project, one canvas",
+        "detail": "Media pans and zooms 0.5x-3.0x underneath a stationary safe-zone grid.",
+        "sourceRef": "lib/features/preview/presentation/preview_screen.dart"
+      },
+      {
+        "id": "capture_screen",
+        "label": "Record screen",
+        "kind": "entry",
+        "sub": "guides over the sensor feed",
+        "detail": "Shoot a take with the platform's safe zones already drawn over the live camera preview.",
+        "sourceRef": "lib/features/capture/presentation/capture_screen.dart"
+      },
+      {
+        "id": "settings_screen",
+        "label": "Settings",
+        "kind": "entry",
+        "sub": "theme, overlay scope, privacy",
+        "detail": "States plainly where the user's data lives; overlay controls are scoped to every project open.",
+        "sourceRef": "lib/features/settings/presentation/settings_screen.dart"
+      },
+      {
+        "id": "preview_providers",
+        "label": "Riverpod graph",
+        "kind": "service",
+        "sub": "editor-scoped providers",
+        "detail": "Hosts the decoder in the editor's scope so leaving the editor disposes the native texture.",
+        "sourceRef": "lib/features/preview/application/preview_providers.dart"
+      },
+      {
+        "id": "preview_state",
+        "label": "PreviewState",
+        "kind": "service",
+        "sub": "platform, toggles, transform",
+        "detail": "Immutable canvas state: selected platform, guide toggles, chrome opacity, zoom and pan.",
+        "sourceRef": "lib/features/preview/application/preview_state.dart"
+      },
+      {
+        "id": "presets",
+        "label": "Bundled presets",
+        "kind": "store",
+        "sub": "6 platforms as data",
+        "group": "Safe-zone engine",
+        "detail": "Every platform's geometry in pixels against a 1080x1920 master canvas, compiled into the app.",
+        "sourceRef": "lib/features/safezone/data/safe_zone_presets.dart"
+      },
+      {
+        "id": "safezone_repo",
+        "label": "SafeZoneRepository",
+        "kind": "service",
+        "sub": "merge + validate overrides",
+        "group": "Safe-zone engine",
+        "detail": "Bundled presets are the floor; a malformed or unusable override is discarded rather than rendered.",
+        "sourceRef": "lib/features/safezone/data/safe_zone_repository.dart"
+      },
+      {
+        "id": "remote_source",
+        "label": "Remote geometry source",
+        "kind": "service",
+        "sub": "one safe_zones parameter",
+        "group": "Safe-zone engine",
+        "detail": "Parses a hand-typed JSON object keyed by platform id; parsing is split out so it is testable.",
+        "sourceRef": "lib/features/safezone/data/remote_config_source.dart"
+      },
+      {
+        "id": "overlay_geometry",
+        "label": "OverlayGeometry",
+        "kind": "service",
+        "sub": "pure rect maths",
+        "group": "Safe-zone engine",
+        "detail": "Derives every rectangle the overlay needs; touches no widget layer, so it is directly unit-tested.",
+        "sourceRef": "lib/features/overlay/presentation/overlay_geometry.dart"
+      },
+      {
+        "id": "overlay_painter",
+        "label": "Safe-zone painter",
+        "kind": "service",
+        "sub": "hazard mask + safe frame",
+        "group": "Safe-zone engine",
+        "detail": "shouldRepaint depends only on platform and toggles, never on zoom, so reframing stays smooth.",
+        "sourceRef": "lib/features/overlay/presentation/safe_zone_overlay_painter.dart"
+      },
+      {
+        "id": "chrome_glyphs",
+        "label": "Chrome glyph layer",
+        "kind": "service",
+        "sub": "generic SVG action rail",
+        "group": "Safe-zone engine",
+        "detail": "Feeds are identified by brand-adjacent colour and generic glyphs, never by real trademarks.",
+        "sourceRef": "lib/features/overlay/presentation/chrome_glyph_layer.dart"
+      },
+      {
+        "id": "firebase_rc",
+        "label": "Firebase Remote Config",
+        "kind": "external",
+        "sub": "optional, never required",
+        "domain": "firebase.google.com",
+        "detail": "Lets platform geometry be corrected the same day instead of waiting on a store review."
+      },
+      {
+        "id": "media_session",
+        "label": "MediaSession",
+        "kind": "service",
+        "sub": "one decoder, strict ownership",
+        "detail": "Disposes the outgoing handle first, so no widget can rebuild against a dead texture.",
+        "sourceRef": "lib/features/media/application/media_session.dart"
+      },
+      {
+        "id": "video_handle",
+        "label": "video_player handle",
+        "kind": "tool",
+        "sub": "native decoder + texture",
+        "detail": "Wrapped behind a PlayableHandle interface so leak paths are testable without a platform decoder.",
+        "sourceRef": "lib/features/media/application/video_playable_handle.dart"
+      },
+      {
+        "id": "media_viewport",
+        "label": "Media viewport",
+        "kind": "service",
+        "sub": "pan / zoom 0.5x-3.0x",
+        "detail": "Transforms the footage only; the guides belong to the platform frame and stay put.",
+        "sourceRef": "lib/features/media/presentation/media_viewport.dart"
+      },
+      {
+        "id": "video_transport",
+        "label": "Transport bar",
+        "kind": "service",
+        "sub": "scrub + frame step",
+        "detail": "Lives outside the canvas so it is never burned into an export or mistaken for platform chrome.",
+        "sourceRef": "lib/features/media/presentation/video_transport.dart"
+      },
+      {
+        "id": "image_picker",
+        "label": "Photo / video picker",
+        "kind": "tool",
+        "sub": "image_picker",
+        "detail": "Injected so cancel, undecodable file and picker-unavailable are all covered end to end.",
+        "sourceRef": "lib/features/preview/widgets/media_source_sheet.dart"
+      },
+      {
+        "id": "camera",
+        "label": "Camera",
+        "kind": "tool",
+        "sub": "bounded init timeouts",
+        "detail": "availableCameras and initialize are time-bounded because a wedged camera service hangs instead of throwing.",
+        "sourceRef": "lib/features/capture/presentation/capture_screen.dart"
+      },
+      {
+        "id": "capture_permissions",
+        "label": "Capture permissions",
+        "kind": "service",
+        "sub": "camera / mic mapping",
+        "group": "Capture & export",
+        "detail": "Maps platform permission outcomes onto one explainable state, including camera-without-microphone.",
+        "sourceRef": "lib/features/capture/application/capture_permissions.dart"
+      },
+      {
+        "id": "capture_storage",
+        "label": "CaptureStorage",
+        "kind": "service",
+        "sub": "cache to documents",
+        "group": "Capture & export",
+        "detail": "Moves a take out of the purgeable cache and gates deletion on files the app itself created.",
+        "sourceRef": "lib/features/capture/application/capture_storage.dart"
+      },
+      {
+        "id": "screenshot_capture",
+        "label": "Canvas rasteriser",
+        "kind": "tool",
+        "sub": "RepaintBoundary capture",
+        "group": "Capture & export",
+        "detail": "Renders exactly what the preview shows, at a scale that reaches a true 1080x1920 frame.",
+        "sourceRef": "lib/features/preview/presentation/preview_screen.dart"
+      },
+      {
+        "id": "export_service",
+        "label": "ExportService",
+        "kind": "service",
+        "sub": "permission, naming, save",
+        "group": "Capture & export",
+        "detail": "Never throws: every failure path returns a result the UI can render without reading exceptions.",
+        "sourceRef": "lib/features/export/application/export_service.dart"
+      },
+      {
+        "id": "platform_gallery",
+        "label": "Gallery adapter",
+        "kind": "service",
+        "sub": "gal + photo permission",
+        "group": "Capture & export",
+        "detail": "One adapter behind a GallerySaver interface, so swapping the saver package moved nothing above it.",
+        "sourceRef": "lib/features/export/application/platform_gallery.dart"
+      },
+      {
+        "id": "photo_library",
+        "label": "Device photo library",
+        "kind": "external",
+        "sub": "named album",
+        "detail": "Exports are written into the app's own album; nothing is ever uploaded anywhere."
+      },
+      {
+        "id": "share_sheet",
+        "label": "System share sheet",
+        "kind": "tool",
+        "sub": "share_plus",
+        "detail": "Shares the exact PNG that was saved, straight from the device."
+      },
+      {
+        "id": "project_repo",
+        "label": "ProjectRepository",
+        "kind": "service",
+        "sub": "local library, no account",
+        "detail": "Mutations return the library they produced instead of re-reading it, so state matches the write.",
+        "sourceRef": "lib/features/projects/data/project_repository.dart"
+      },
+      {
+        "id": "thumbnail_store",
+        "label": "ThumbnailStore",
+        "kind": "store",
+        "sub": "captured from the canvas",
+        "detail": "Reuses the editor's own render instead of adding a native video-thumbnail plugin for a 15KB image.",
+        "sourceRef": "lib/features/projects/application/thumbnail_store.dart"
+      },
+      {
+        "id": "app_documents",
+        "label": "App documents",
+        "kind": "store",
+        "sub": "captures/ and thumbnails/",
+        "detail": "Durable on-device storage for recordings and card previews; deleted with their project.",
+        "sourceRef": "lib/core/app_paths.dart"
+      },
+      {
+        "id": "settings_repo",
+        "label": "Settings store",
+        "kind": "service",
+        "sub": "tolerant decoding",
+        "detail": "Preferences clamp and decode defensively so a bad stored value cannot brick the app.",
+        "sourceRef": "lib/features/settings/data/settings_repository.dart"
+      },
+      {
+        "id": "shared_prefs",
+        "label": "Shared preferences",
+        "kind": "store",
+        "sub": "theme + overlay defaults",
+        "detail": "The only thing the app persists besides projects, thumbnails and takes."
+      },
+      {
+        "id": "ad_config",
+        "label": "AdConfig",
+        "kind": "service",
+        "sub": "test units unless overridden",
+        "group": "Monetisation",
+        "detail": "Unit ids come from per-platform config templates; a half-configured override is rejected wholesale.",
+        "sourceRef": "lib/features/ads/application/ad_config.dart"
+      },
+      {
+        "id": "interstitial_gate",
+        "label": "InterstitialGate",
+        "kind": "service",
+        "sub": "two moments, 90s cooldown",
+        "group": "Monetisation",
+        "detail": "Pure policy with no SDK handles: the AdMoment enum is the whole rule and a test pins its size.",
+        "sourceRef": "lib/features/ads/application/interstitial_gate.dart"
+      },
+      {
+        "id": "ad_manager",
+        "label": "AdManager",
+        "kind": "service",
+        "sub": "resolves on dismissal",
+        "group": "Monetisation",
+        "detail": "Full-screen ads complete their future when dismissed, so an export never rasterises behind an ad.",
+        "sourceRef": "lib/features/ads/application/ad_manager.dart"
+      },
+      {
+        "id": "anchored_banner",
+        "label": "Anchored banner",
+        "kind": "service",
+        "sub": "outside canvas and export",
+        "group": "Monetisation",
+        "detail": "Reserves no height when nothing fills it, and sits outside every exported frame.",
+        "sourceRef": "lib/features/ads/presentation/anchored_banner.dart"
+      },
+      {
+        "id": "admob",
+        "label": "Google AdMob",
+        "kind": "external",
+        "sub": "the one third party",
+        "domain": "admob.google.com",
+        "detail": "The only component that sends anything off the device, declared as such in the privacy manifest."
+      },
+      {
+        "id": "ci",
+        "label": "CI pipeline",
+        "kind": "service",
+        "sub": "format, analyse, test, shuffle",
+        "detail": "Also greps the tree for credential files and live publisher ids before any build job runs.",
+        "sourceRef": ".github/workflows/ci.yml"
+      },
+      {
+        "id": "actions",
+        "label": "GitHub Actions",
+        "kind": "external",
+        "sub": "Android + iOS artifacts",
+        "domain": "github.com",
+        "detail": "Builds an obfuscated Android bundle with its debug symbols and an unsigned iOS release."
+      }
+    ],
+    "edges": [
+      {
+        "from": "main",
+        "to": "app_services",
+        "kind": "calls",
+        "label": "builds sync"
+      },
+      {
+        "from": "app_services",
+        "to": "presets",
+        "kind": "reads",
+        "label": "boots offline"
+      },
+      {
+        "from": "app_services",
+        "to": "safezone_repo",
+        "kind": "calls"
+      },
+      {
+        "from": "app_services",
+        "to": "ad_manager",
+        "kind": "calls",
+        "label": "ads off first"
+      },
+      {
+        "from": "app_services",
+        "to": "export_service",
+        "kind": "calls"
+      },
+      {
+        "from": "app_services",
+        "to": "remote_source",
+        "kind": "calls",
+        "label": "after first paint"
+      },
+      {
+        "from": "main",
+        "to": "home_screen",
+        "kind": "triggers"
+      },
+      {
+        "from": "home_screen",
+        "to": "preview_screen",
+        "kind": "triggers",
+        "label": "one tap to check"
+      },
+      {
+        "from": "home_screen",
+        "to": "capture_screen",
+        "kind": "triggers",
+        "label": "platform first"
+      },
+      {
+        "from": "home_screen",
+        "to": "settings_screen",
+        "kind": "triggers"
+      },
+      {
+        "from": "home_screen",
+        "to": "project_repo",
+        "kind": "reads"
+      },
+      {
+        "from": "home_screen",
+        "to": "thumbnail_store",
+        "kind": "reads",
+        "label": "card previews"
+      },
+      {
+        "from": "remote_source",
+        "to": "firebase_rc",
+        "kind": "reads",
+        "label": "safe_zones param"
+      },
+      {
+        "from": "remote_source",
+        "to": "safezone_repo",
+        "kind": "writes",
+        "label": "overrides or none"
+      },
+      {
+        "from": "presets",
+        "to": "safezone_repo",
+        "kind": "reads",
+        "label": "the floor"
+      },
+      {
+        "from": "safezone_repo",
+        "to": "overlay_geometry",
+        "kind": "writes",
+        "label": "validated geometry"
+      },
+      {
+        "from": "overlay_geometry",
+        "to": "overlay_painter",
+        "kind": "writes"
+      },
+      {
+        "from": "overlay_geometry",
+        "to": "chrome_glyphs",
+        "kind": "writes"
+      },
+      {
+        "from": "overlay_painter",
+        "to": "preview_screen",
+        "kind": "writes",
+        "label": "guides layer"
+      },
+      {
+        "from": "chrome_glyphs",
+        "to": "preview_screen",
+        "kind": "writes",
+        "label": "mock chrome"
+      },
+      {
+        "from": "overlay_painter",
+        "to": "capture_screen",
+        "kind": "writes",
+        "label": "guides on sensor"
+      },
+      {
+        "from": "preview_screen",
+        "to": "preview_providers",
+        "kind": "calls"
+      },
+      {
+        "from": "preview_providers",
+        "to": "preview_state",
+        "kind": "writes"
+      },
+      {
+        "from": "preview_providers",
+        "to": "media_session",
+        "kind": "calls",
+        "label": "editor-scoped"
+      },
+      {
+        "from": "media_session",
+        "to": "video_handle",
+        "kind": "calls",
+        "label": "one alive at a time"
+      },
+      {
+        "from": "video_handle",
+        "to": "media_viewport",
+        "kind": "writes",
+        "label": "frames"
+      },
+      {
+        "from": "media_viewport",
+        "to": "preview_screen",
+        "kind": "writes"
+      },
+      {
+        "from": "video_transport",
+        "to": "media_session",
+        "kind": "calls",
+        "label": "scrub / step"
+      },
+      {
+        "from": "image_picker",
+        "to": "media_session",
+        "kind": "writes",
+        "label": "picked clip"
+      },
+      {
+        "from": "preview_screen",
+        "to": "image_picker",
+        "kind": "triggers"
+      },
+      {
+        "from": "capture_screen",
+        "to": "capture_permissions",
+        "kind": "calls"
+      },
+      {
+        "from": "capture_screen",
+        "to": "camera",
+        "kind": "calls",
+        "label": "timeout bounded"
+      },
+      {
+        "from": "camera",
+        "to": "capture_storage",
+        "kind": "writes",
+        "label": "take from cache"
+      },
+      {
+        "from": "capture_storage",
+        "to": "app_documents",
+        "kind": "writes",
+        "label": "durable path"
+      },
+      {
+        "from": "capture_storage",
+        "to": "project_repo",
+        "kind": "writes",
+        "label": "auto-named project"
+      },
+      {
+        "from": "preview_screen",
+        "to": "screenshot_capture",
+        "kind": "triggers",
+        "label": "export tap"
+      },
+      {
+        "from": "screenshot_capture",
+        "to": "export_service",
+        "kind": "writes",
+        "label": "1080x1920 bytes"
+      },
+      {
+        "from": "export_service",
+        "to": "platform_gallery",
+        "kind": "calls",
+        "label": "permission first"
+      },
+      {
+        "from": "platform_gallery",
+        "to": "photo_library",
+        "kind": "writes",
+        "label": "named album"
+      },
+      {
+        "from": "export_service",
+        "to": "share_sheet",
+        "kind": "triggers",
+        "label": "share the PNG"
+      },
+      {
+        "from": "screenshot_capture",
+        "to": "thumbnail_store",
+        "kind": "writes",
+        "label": "clean, no guides"
+      },
+      {
+        "from": "thumbnail_store",
+        "to": "app_documents",
+        "kind": "writes"
+      },
+      {
+        "from": "preview_screen",
+        "to": "project_repo",
+        "kind": "writes",
+        "label": "returns new library"
+      },
+      {
+        "from": "project_repo",
+        "to": "capture_storage",
+        "kind": "calls",
+        "label": "delete only ours"
+      },
+      {
+        "from": "settings_screen",
+        "to": "settings_repo",
+        "kind": "writes"
+      },
+      {
+        "from": "settings_repo",
+        "to": "shared_prefs",
+        "kind": "writes"
+      },
+      {
+        "from": "settings_repo",
+        "to": "preview_state",
+        "kind": "writes",
+        "label": "on every open"
+      },
+      {
+        "from": "ad_config",
+        "to": "ad_manager",
+        "kind": "reads",
+        "label": "test unless whole"
+      },
+      {
+        "from": "interstitial_gate",
+        "to": "ad_manager",
+        "kind": "reads",
+        "label": "two moments only"
+      },
+      {
+        "from": "ad_manager",
+        "to": "admob",
+        "kind": "calls"
+      },
+      {
+        "from": "ad_manager",
+        "to": "anchored_banner",
+        "kind": "writes"
+      },
+      {
+        "from": "anchored_banner",
+        "to": "admob",
+        "kind": "calls"
+      },
+      {
+        "from": "ad_manager",
+        "to": "export_service",
+        "kind": "triggers",
+        "label": "ad then capture"
+      },
+      {
+        "from": "main",
+        "to": "ad_manager",
+        "kind": "triggers",
+        "label": "one launch ad"
+      },
+      {
+        "from": "ci",
+        "to": "actions",
+        "kind": "calls"
+      },
+      {
+        "from": "ci",
+        "to": "ad_config",
+        "kind": "reads",
+        "label": "no live ids"
+      },
+      {
+        "from": "actions",
+        "to": "app_services",
+        "kind": "triggers",
+        "label": "builds artifacts"
+      }
+    ]
+  }
+}

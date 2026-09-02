@@ -2,9 +2,9 @@
 
 Preview a vertical video against the real UI safe zones of every short-form feed — before you post it.
 
-[![Architecture map](banner.png)](https://fred-in-tech.github.io/fvm-system-maps/safezone-previewer/)
+[![Architecture map](banner.png)](https://fred-in-tech.github.io/safezone-previewer/map/)
 
-*Interactive, pannable version: [open the architecture map](https://fred-in-tech.github.io/fvm-system-maps/safezone-previewer/)*
+*Interactive, pannable version: [open the architecture map](https://fred-in-tech.github.io/safezone-previewer/map/)*
 
 ## What it is
 
